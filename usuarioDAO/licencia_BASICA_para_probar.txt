@@ -1,0 +1,4 @@
+# Archivo de licencia del sistema
+# Planes: COMPLETA (todos los modulos) o BASICA (solo Socios y Asistencias)
+CODIGO=GYM-BASICA-06ACC23B
+VENCIMIENTO=2027-12-31

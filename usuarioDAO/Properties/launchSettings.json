@@ -1,0 +1,11 @@
+{
+  "profiles": {
+    "Programa": {
+      "commandName": "Project"
+    },
+    "Pruebas": {
+      "commandName": "Project",
+      "commandLineArgs": "--pruebas"
+    }
+  }
+}
