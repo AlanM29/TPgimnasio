@@ -51,6 +51,7 @@ public static class InicializadorBd
 
             @"CREATE TABLE IF NOT EXISTS Socios (
                 id_socio   INTEGER PRIMARY KEY AUTOINCREMENT,
+                dni        TEXT NOT NULL UNIQUE,
                 nombre     TEXT NOT NULL,
                 apellido   TEXT NOT NULL,
                 email      TEXT UNIQUE,
@@ -98,10 +99,10 @@ public static class InicializadorBd
                 id_membresia INTEGER NOT NULL,
                 fecha_pago   TEXT NOT NULL DEFAULT (datetime('now', 'localtime')),
                 monto        REAL NOT NULL CHECK (monto > 0),
-                metodo_pago  TEXT NOT NULL,
-                estado       TEXT NOT NULL,
+                metodo_pago  TEXT NOT NULL CHECK (metodo_pago IN ('Efectivo','Tarjeta','Transferencia')),
+                estado       TEXT NOT NULL DEFAULT 'Pagado' CHECK (estado IN ('Pagado','Anulado')),
                 FOREIGN KEY (id_membresia) REFERENCES Membresia (id_membresia)
-                    ON UPDATE CASCADE ON DELETE RESTRICT
+                     ON UPDATE CASCADE ON DELETE RESTRICT
             )",
 
             @"CREATE TABLE IF NOT EXISTS asistencias (
