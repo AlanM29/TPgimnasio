@@ -1,14 +1,7 @@
 using System;
 using System.Collections.Generic;
-using Microsoft.Data.Sqlite;
+using System.Data.SQLite;
 
-// =====================================================
-//  PRUEBAS AUTOMÁTICAS DE TODO EL SISTEMA
-//  Cómo correrlas:  perfil "Pruebas" en Visual Studio
-//                   o:  dotnet run -- --pruebas
-//  Cada línea muestra [OK] o [ERROR]. Al final hay un resumen.
-//  Incluye los casos que armó el compañero en pruebas.cs.
-// =====================================================
 public static class PruebasGenerales
 {
     private static int _correctas;
@@ -206,24 +199,24 @@ public static class PruebasGenerales
 
         string[] tablas = { "Socios", "Tipo_Membresias", "empleados", "Usuario", "Membresia", "Pago", "asistencias" };
 
-        using (SqliteConnection conexion = ConexionBd.ObtenerConexion())
+        using (SQLiteConnection conexion = ConexionBd.ObtenerConexion())
         {
             foreach (string tabla in tablas)
             {
                 string sql = "SELECT COUNT(*) FROM sqlite_master WHERE type = 'table' AND name = @nombre COLLATE NOCASE";
-                using (SqliteCommand comando = new SqliteCommand(sql, conexion))
+                using (SQLiteCommand comando = new SQLiteCommand(sql, conexion))
                 {
                     comando.Parameters.AddWithValue("@nombre", tabla);
                     Verificar("Existe la tabla " + tabla, Convert.ToInt32(comando.ExecuteScalar()) == 1);
                 }
             }
 
-            using (SqliteCommand comando = new SqliteCommand("SELECT COUNT(*) FROM Usuario", conexion))
+            using (SQLiteCommand comando = new SQLiteCommand("SELECT COUNT(*) FROM Usuario", conexion))
             {
                 Verificar("Hay al menos un usuario cargado", Convert.ToInt32(comando.ExecuteScalar()) >= 1);
             }
 
-            using (SqliteCommand comando = new SqliteCommand("PRAGMA foreign_keys", conexion))
+            using (SQLiteCommand comando = new SQLiteCommand("PRAGMA foreign_keys", conexion))
             {
                 Verificar("Las claves foráneas están activadas", Convert.ToInt32(comando.ExecuteScalar()) == 1);
             }
@@ -284,7 +277,7 @@ public static class PruebasGenerales
         Verificar("Si el DAO no encuentra al usuario, el login devuelve null", login.Ingresar("otro", "x") == null);
 
         // InicializadorBd sobre una base en memoria (no toca el archivo real)
-        using (SqliteConnection memoria = new SqliteConnection("Data Source=:memory:"))
+        using ( SQLiteConnection memoria = new SQLiteConnection("Data Source=:memory:"))
         {
             memoria.Open();
             InicializadorBd.Inicializar(memoria);
@@ -301,9 +294,9 @@ public static class PruebasGenerales
         }
     }
 
-    private static int ContarFilas(SqliteConnection conexion, string sql)
+    private static int ContarFilas(SQLiteConnection conexion, string sql)
     {
-        using (SqliteCommand comando = new SqliteCommand(sql, conexion))
+        using (SQLiteCommand comando = new SQLiteCommand(sql, conexion))
         {
             return Convert.ToInt32(comando.ExecuteScalar());
         }

@@ -1,6 +1,6 @@
 using System;
 using System.Globalization;
-using Microsoft.Data.Sqlite;
+using System.Data.SQLite;
 
 //  DAO: UsuarioDao 
 //  Es la ÚNICA clase que consulta la tabla Usuario.
@@ -13,7 +13,7 @@ public class UsuarioDao : IUsuarioDao
     {
         try
         {
-            using (SqliteConnection conexion = ConexionBd.ObtenerConexion())
+            using (SQLiteConnection conexion = ConexionBd.ObtenerConexion())
             {
                 // @nombre y @clave son parámetros
                 string sql = "SELECT u.id_usuario, u.nombre_usuario, u.contrasenahash, u.rol, " +
@@ -24,12 +24,12 @@ public class UsuarioDao : IUsuarioDao
                              "  AND LOWER(u.contrasenahash) = @clave " +
                              "  AND e.estado = 'Activo'";
 
-                using (SqliteCommand comando = new SqliteCommand(sql, conexion))
+                using (SQLiteCommand comando = new SQLiteCommand(sql, conexion))
                 {
                     comando.Parameters.AddWithValue("@nombre", nombreUsuario);
                     comando.Parameters.AddWithValue("@clave", contrasenaHash.ToLower());
 
-                    using (SqliteDataReader lector = comando.ExecuteReader())
+                    using (SQLiteDataReader lector = comando.ExecuteReader())
                     {
                         if (lector.Read())
                         {
@@ -39,7 +39,7 @@ public class UsuarioDao : IUsuarioDao
                 }
             }
         }
-        catch (SqliteException ex)
+        catch (SQLiteException ex)
         {
             Console.WriteLine("Error de base de datos: " + ex.Message);
         }
@@ -53,7 +53,7 @@ public class UsuarioDao : IUsuarioDao
     }
 
     // Convierte la fila en el objeto del tipo correcto usando la UsuarioFactory
-    private UsuarioBase CrearDesdeFila(SqliteDataReader lector)
+    private UsuarioBase CrearDesdeFila(SQLiteDataReader lector)
     {
         int id = lector.GetInt32(0);
         string nombreUsuario = lector.GetString(1);

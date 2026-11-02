@@ -31,6 +31,7 @@ public abstract class UsuarioBase
         Telefono = ValidarTelefono(telefono);
         Id = id;
         Activo = activo;
+        Fecha_Creacion = fecha_creacion;
     }
     public void AsignarId(int id) => Id = id;
     public void CambiarContrasenahash(string contrasenianueva) => Contrasenahash = ValidarObligatorio(contrasenianueva, "La contrasena");
@@ -65,7 +66,7 @@ public abstract class UsuarioBase
         }
         return nombre;
     }
-    private static string ValidarEmail(string? valor)
+    private static string? ValidarEmail(string? valor)
     {
         if (string.IsNullOrWhiteSpace(valor))
         {
@@ -76,7 +77,7 @@ public abstract class UsuarioBase
             throw new ArgumentException("El email tiene un formato invalido");
         return email;
     }
-    private static string ValidarTelefono(string? valor)
+    private static string? ValidarTelefono(string? valor)
     {
         if (string.IsNullOrWhiteSpace(valor))
         {

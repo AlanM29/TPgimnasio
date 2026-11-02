@@ -1,6 +1,6 @@
 using System;
 using System.IO;
-using Microsoft.Data.Sqlite;
+using System.Data.SQLite;
 
 //  DAO: ConexionBd
 //  Su único trabajo es ABRIR la conexión a la base de datos.
@@ -16,18 +16,21 @@ public static class ConexionBd
     }
 
     // Abre y devuelve una conexión. Quien la pide la cierra con "using".
-    public static SqliteConnection ObtenerConexion()
+    public static SQLiteConnection ObtenerConexion()
     {
-        SqliteConnectionStringBuilder constructor = new SqliteConnectionStringBuilder();
-        constructor.DataSource = RutaArchivo();
+        string ruta = RutaArchivo();
 
-        // ReadWriteCreate: si el archivo no existe, lo crea (después InicializadorBd le arma las tablas)
-        constructor.Mode = SqliteOpenMode.ReadWriteCreate;
+        // Si el archivo no existe, se crea vacío (después InicializadorBd arma las tablas)
+        if (!File.Exists(ruta))
+        {
+            SQLiteConnection.CreateFile(ruta);
+        }
 
-        // Hace que SQLite respete las claves foráneas (por ejemplo ON DELETE RESTRICT)
+        SQLiteConnectionStringBuilder constructor = new SQLiteConnectionStringBuilder();
+        constructor.DataSource = ruta;
         constructor.ForeignKeys = true;
 
-        SqliteConnection conexion = new SqliteConnection(constructor.ToString());
+        SQLiteConnection conexion = new SQLiteConnection(constructor.ToString());
         conexion.Open();
         return conexion;
     }
@@ -42,13 +45,13 @@ public static class ConexionBd
     {
         try
         {
-            using (SqliteConnection conexion = ObtenerConexion())
+            using (SQLiteConnection conexion = ObtenerConexion())
             {
                 mensaje = "Conexión correcta.";
                 return true;
             }
         }
-        catch (SqliteException ex)
+        catch (SQLiteException ex)
         {
             mensaje = "No se pudo conectar a la base de datos: " + ex.Message;
             return false;

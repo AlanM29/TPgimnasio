@@ -1,6 +1,5 @@
 using System;
-using Microsoft.Data.Sqlite;
-
+using System.Data.SQLite;
 
 //  DAO: InicializadorBd
 //  Deja la base de datos lista para usar:
@@ -15,14 +14,14 @@ public static class InicializadorBd
     {
         try
         {
-            using (SqliteConnection conexion = ConexionBd.ObtenerConexion())
+            using (SQLiteConnection conexion = ConexionBd.ObtenerConexion())
             {
                 Inicializar(conexion);
             }
             mensaje = "Base de datos lista.";
             return true;
         }
-        catch (SqliteException ex)
+        catch (SQLiteException ex)
         {
             mensaje = "No se pudo preparar la base de datos: " + ex.Message;
             return false;
@@ -30,7 +29,7 @@ public static class InicializadorBd
     }
 
     // Versión que recibe la conexión
-    public static void Inicializar(SqliteConnection conexion)
+    public static void Inicializar(SQLiteConnection conexion)
     {
         CrearTablas(conexion);
         CargarTiposDeMembresia(conexion);
@@ -39,7 +38,7 @@ public static class InicializadorBd
 
     // ---------- 1. TABLAS ----------
     // Primero las tablas "padre" y después las que dependen de ellas
-    private static void CrearTablas(SqliteConnection conexion)
+    private static void CrearTablas(SQLiteConnection conexion)
     {
         string[] tablas =
         {
@@ -121,7 +120,7 @@ public static class InicializadorBd
     }
 
     // ---------- 2. DATOS INICIALES ----------
-    private static void CargarTiposDeMembresia(SqliteConnection conexion)
+    private static void CargarTiposDeMembresia(SQLiteConnection conexion)
     {
         if (Contar(conexion, "Tipo_Membresias") > 0)
         {
@@ -133,12 +132,12 @@ public static class InicializadorBd
         InsertarTipo(conexion, "Anual", 220000, 365);
     }
 
-    private static void InsertarTipo(SqliteConnection conexion, string tipo, double precio, int dias)
+    private static void InsertarTipo(SQLiteConnection conexion, string tipo, double precio, int dias)
     {
         string sql = "INSERT INTO Tipo_Membresias (tipo, precio_base, duracion_dias) " +
                      "VALUES (@tipo, @precio, @dias)";
 
-        using (SqliteCommand comando = new SqliteCommand(sql, conexion))
+        using (SQLiteCommand comando = new SQLiteCommand(sql, conexion))
         {
             comando.Parameters.AddWithValue("@tipo", tipo);
             comando.Parameters.AddWithValue("@precio", precio);
@@ -148,7 +147,7 @@ public static class InicializadorBd
     }
 
     // Si no hay ningún usuario, crea un admin y un recepcionista para poder entrar
-    private static void CargarUsuariosIniciales(SqliteConnection conexion)
+    private static void CargarUsuariosIniciales(SQLiteConnection conexion)
     {
         if (Contar(conexion, "Usuario") > 0)
         {
@@ -164,14 +163,14 @@ public static class InicializadorBd
         InsertarUsuario(conexion, idRecepcion, "recepcion", Seguridad.CalcularHash("recep123"), "usuario");
     }
 
-    private static int ObtenerOCrearEmpleado(SqliteConnection conexion, string nombre, string apellido,
+    private static int ObtenerOCrearEmpleado(SQLiteConnection conexion, string nombre, string apellido,
                                              string email, string telefono, string puesto)
     {
         // OR IGNORE: si ya existía un empleado con ese email, no lo duplica
         string sqlInsertar = "INSERT OR IGNORE INTO empleados (nombre, apellido, email, telefono, puesto) " +
                              "VALUES (@nombre, @apellido, @email, @telefono, @puesto)";
 
-        using (SqliteCommand comando = new SqliteCommand(sqlInsertar, conexion))
+        using (SQLiteCommand comando = new SQLiteCommand(sqlInsertar, conexion))
         {
             comando.Parameters.AddWithValue("@nombre", nombre);
             comando.Parameters.AddWithValue("@apellido", apellido);
@@ -181,20 +180,20 @@ public static class InicializadorBd
             comando.ExecuteNonQuery();
         }
 
-        using (SqliteCommand comando = new SqliteCommand("SELECT id_empleado FROM empleados WHERE email = @email", conexion))
+        using (SQLiteCommand comando = new SQLiteCommand("SELECT id_empleado FROM empleados WHERE email = @email", conexion))
         {
             comando.Parameters.AddWithValue("@email", email);
             return Convert.ToInt32(comando.ExecuteScalar());
         }
     }
 
-    private static void InsertarUsuario(SqliteConnection conexion, int idEmpleado, string nombreUsuario,
-                                        string contrasenaHash, string rol)
+    private static void InsertarUsuario(SQLiteConnection conexion, int idEmpleado, string nombreUsuario,
+                                        string contrasenaHash, string rol)// Inserta un nuevo usuario en su respectiva tabla. Se asume que el empleado ya esta cargado
     {
         string sql = "INSERT INTO Usuario (id_empleado, nombre_usuario, contrasenahash, rol) " +
                      "VALUES (@empleado, @usuario, @hash, @rol)";
 
-        using (SqliteCommand comando = new SqliteCommand(sql, conexion))
+        using (SQLiteCommand comando = new SQLiteCommand(sql, conexion))
         {
             comando.Parameters.AddWithValue("@empleado", idEmpleado);
             comando.Parameters.AddWithValue("@usuario", nombreUsuario);
@@ -205,18 +204,18 @@ public static class InicializadorBd
     }
 
     // ---------- AYUDAS ----------
-    private static void EjecutarSql(SqliteConnection conexion, string sql)
+    private static void EjecutarSql(SQLiteConnection conexion, string sql)//ayuda a ejecutar un sql cualquiera, se asume que es correcto y no tiene parametros
     {
-        using (SqliteCommand comando = new SqliteCommand(sql, conexion))
+        using (SQLiteCommand comando = new SQLiteCommand(sql, conexion))
         {
             comando.ExecuteNonQuery();
         }
     }
 
     // Solo se usa con nombres de tabla escritos en este mismo archivo
-    private static int Contar(SqliteConnection conexion, string tabla)
+    private static int Contar(SQLiteConnection conexion, string tabla)
     {
-        using (SqliteCommand comando = new SqliteCommand("SELECT COUNT(*) FROM " + tabla, conexion))
+        using (SQLiteCommand comando = new SQLiteCommand("SELECT COUNT(*) FROM " + tabla, conexion))
         {
             return Convert.ToInt32(comando.ExecuteScalar());
         }
