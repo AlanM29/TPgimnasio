@@ -2,13 +2,13 @@ using System;
 using System.Globalization;
 using System.Data.SQLite;
 
-//  DAO: UsuarioDao 
+//  DAO: UsuarioDAO 
 //  Es la ÚNICA clase que consulta la tabla Usuario.
 
-public class UsuarioDao : IUsuarioDao
+public class UsuarioDAO : IUsuarioDAO
 {
     // Busca un usuario con ese nombre Y esa contraseña .
-    // Une Usuario con empleados , para traer sus datos personales y para no dejar entrar a empleados dados de baja.
+    // Une Usuario con Empleados , para traer sus datos personales y para no dejar entrar a Empleados dados de baja.
     public UsuarioBase? ObtenerPorCredenciales(string nombreUsuario, string contrasenaHash)
     {
         try
@@ -17,9 +17,9 @@ public class UsuarioDao : IUsuarioDao
             {
                 // @nombre y @clave son parámetros
                 string sql = "SELECT u.id_usuario, u.nombre_usuario, u.contrasenahash, u.rol, " +
-                             "       e.nombre, e.apellido, e.email, e.telefono, e.fecha_ingreso " +
+                             "       e.dni, e.nombre, e.apellido, e.email, e.telefono, e.fecha_ingreso " +
                              "FROM Usuario u " +
-                             "INNER JOIN empleados e ON e.id_empleado = u.id_empleado " +
+                             "INNER JOIN Empleados e ON e.id_empleado = u.id_empleado " +
                              "WHERE u.nombre_usuario = @nombre " +
                              "  AND LOWER(u.contrasenahash) = @clave " +
                              "  AND e.estado = 'Activo'";
@@ -53,21 +53,24 @@ public class UsuarioDao : IUsuarioDao
     }
 
     // Convierte la fila en el objeto del tipo correcto usando la UsuarioFactory
+   
     private UsuarioBase CrearDesdeFila(SQLiteDataReader lector)
     {
         int id = lector.GetInt32(0);
         string nombreUsuario = lector.GetString(1);
         string hash = lector.GetString(2);
         string rolEnBase = lector.GetString(3);
-        string nombre = lector.GetString(4);
-        string apellido = lector.GetString(5);
-        string? email = lector.IsDBNull(6) ? null : lector.GetString(6);
-        string? telefono = lector.IsDBNull(7) ? null : lector.GetString(7);
-        DateTime fecha = LeerFecha(lector.GetString(8));
+        string dni = lector.GetString(4);
+        string nombre = lector.GetString(5);
+        string apellido = lector.GetString(6);
+        string? email = lector.IsDBNull(7) ? null : lector.GetString(7);
+        string? telefono = lector.IsDBNull(8) ? null : lector.GetString(8);
+        DateTime fecha = LeerFecha(lector.GetString(9));
 
         return UsuarioFactory.Crear(TraducirRol(rolEnBase), nombreUsuario, hash, nombre, apellido,
-                                    email, telefono, fecha, true, id);
+                                    dni, email, telefono, fecha, true, id);
     }
+
 
     private string TraducirRol(string rolEnBase)
     {

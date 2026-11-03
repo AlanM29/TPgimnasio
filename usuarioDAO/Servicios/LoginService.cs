@@ -1,15 +1,15 @@
 //  LoginService
 public class LoginService
 {
-    private IUsuarioDao _usuarioDao;
+    private IUsuarioDAO _usuarioDao;
 
     // Constructor normal: usa el DAO real (SQLite)
-    public LoginService() : this(new UsuarioDao())
+    public LoginService() : this(new UsuarioDAO())
     {
     }
 
     // Constructor que recibe cualquier DAO 
-    public LoginService(IUsuarioDao usuarioDao)
+    public LoginService(IUsuarioDAO usuarioDao)
     {
         _usuarioDao = usuarioDao;
     }

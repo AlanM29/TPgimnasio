@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Data.SQLite;
 
+
 public static class PruebasGenerales
 {
     private static int _correctas;
@@ -13,15 +14,17 @@ public static class PruebasGenerales
         _errores = 0;
 
         Console.WriteLine("=== PRUEBAS AUTOMÁTICAS DEL SISTEMA ===");
+        string mensajeBd;
+        InicializadorBd.Inicializar(out mensajeBd);
 
         Seccion("1. Modelo de usuarios (UsuarioBase, Admin, Recepcionista)", PruebasModelo);
         Seccion("2. Fábrica de usuarios (UsuarioFactory)", PruebasFabrica);
         Seccion("3. Seguridad (hash de contraseñas)", PruebasSeguridad);
         Seccion("4. Licencia", PruebasLicencia);
         Seccion("5. Conexión y estructura de la base de datos", PruebasBaseDeDatos);
-        Seccion("6. Login (LoginService + UsuarioDao)", PruebasLogin);
+        Seccion("6. Login (LoginService + UsuarioDAO)", PruebasLogin);
         Seccion("7. Registro de actividad (log.txt)", PruebasLog);
-        Seccion("8. Contrato IUsuarioDao e InicializadorBd", PruebasDaoEInicializador);
+        Seccion("8. Contrato IUsuarioDAO e InicializadorBd", PruebasDaoEInicializador);
 
         Console.WriteLine("\n=== RESULTADO: " + _correctas + " correctas, " + _errores + " con error ===");
         if (_errores == 0)
@@ -36,22 +39,22 @@ public static class PruebasGenerales
         DateTime hoy = DateTime.Today;
 
         // Casos de validación (los del compañero)
-        VerificarRechazo("Usuario vacío es rechazado", () => new Admin("", "h", "Ana", "Pérez", null, null, hoy));
-        VerificarRechazo("Usuario corto (menos de 4) es rechazado", () => new Admin("ab", "h", "Ana", "Pérez", null, null, hoy));
-        VerificarRechazo("Usuario con espacio es rechazado", () => new Admin("ana lopez", "h", "Ana", "Pérez", null, null, hoy));
-        VerificarRechazo("Hash vacío es rechazado", () => new Admin("anita", "", "Ana", "Pérez", null, null, hoy));
-        VerificarRechazo("Nombre vacío es rechazado", () => new Admin("anita", "h", "", "Pérez", null, null, hoy));
-        VerificarRechazo("Apellido vacío es rechazado", () => new Admin("anita", "h", "Ana", "", null, null, hoy));
-        VerificarRechazo("Email inválido es rechazado", () => new Admin("anita", "h", "Ana", "Pérez", "abc", null, hoy));
-        VerificarRechazo("Teléfono inválido es rechazado", () => new Admin("anita", "h", "Ana", "Pérez", null, "abc", hoy));
-        VerificarAceptado("Datos válidos son aceptados", () => new Admin("anita", "h", "Ana", "Pérez", "a@b.com", "+54 341 555", hoy));
-        VerificarAceptado("Email y teléfono son opcionales (null)", () => new Recepcionista("lucia", "h2", "Lucía", "Gómez", null, null, hoy));
+        VerificarRechazo("Usuario vacío es rechazado", () => new Admin("", "h", "Ana", "Pérez", "12345678",null, null, hoy));
+        VerificarRechazo("Usuario corto (menos de 4) es rechazado", () => new Admin("ab", "h", "Ana", "Pérez", "12345678",null, null, hoy));
+        VerificarRechazo("Usuario con espacio es rechazado", () => new Admin("ana lopez", "h", "Ana", "Pérez", "12345678",null, null, hoy));
+        VerificarRechazo("Hash vacío es rechazado", () => new Admin("anita", "", "Ana", "Pérez", "12345678",null, null, hoy));
+        VerificarRechazo("Nombre vacío es rechazado", () => new Admin("anita", "h", "", "Pérez", "12345678",null, null, hoy));
+        VerificarRechazo("Apellido vacío es rechazado", () => new Admin("anita", "h", "Ana", "", "12345678",null, null, hoy));
+        VerificarRechazo("Email inválido es rechazado", () => new Admin("anita", "h", "Ana", "Pérez", "12345678","abc", null, hoy));
+        VerificarRechazo("Teléfono inválido es rechazado", () => new Admin("anita", "h", "Ana", "Pérez", "12345678",null, "abc", hoy));
+        VerificarAceptado("Datos válidos son aceptados", () => new Admin("anita", "h", "Ana", "Pérez", "12345678","a@b.com", "+54 341 555", hoy));
+        VerificarAceptado("Email y teléfono son opcionales (null)", () => new Recepcionista("lucia", "h2", "Lucía", "Gómez", "12345678",null, null, hoy));
 
         // Estado del objeto
-        Admin admin = new Admin("anita", "h", "Ana", "Pérez", null, null, hoy);
-        Recepcionista recep = new Recepcionista("lucia", "h", "Lucía", "Gómez", null, null, hoy);
+        Admin admin = new Admin("anita", "h", "Ana", "Pérez", "12345678",null, null, hoy);
+        Recepcionista recep = new Recepcionista("lucia", "h", "Lucía", "Gómez", "12345678",null, null, hoy);
 
-        Verificar("Fecha_Creacion se guarda (corrección aplicada)", admin.Fecha_Creacion == hoy);
+        Verificar("fechaRegistro se guarda (corrección aplicada)", admin.FechaRegistro == hoy);
         Verificar("Un usuario nuevo está activo", admin.Activo);
         Verificar("Un usuario nuevo tiene Id 0", admin.Id == 0);
 
@@ -62,7 +65,7 @@ public static class PruebasGenerales
         recep.AsignarId(7);
         Verificar("AsignarId(7) guarda el Id", recep.Id == 7);
 
-        Recepcionista inactivo = new Recepcionista("pedro", "h", "Pedro", "Díaz", null, null, hoy, activo: false, id: 5);
+        Recepcionista inactivo = new Recepcionista("pedro", "h", "Pedro", "Díaz", "12345678",null, null, hoy, activo: false, id: 5);
         Verificar("Constructor completo: activo=false e id=5", !inactivo.Activo && inactivo.Id == 5);
 
         recep.CambiarContrasenahash("nuevoHash");
@@ -104,17 +107,17 @@ public static class PruebasGenerales
     {
         DateTime hoy = DateTime.Today;
 
-        UsuarioBase a = UsuarioFactory.Crear("Admin", "root", "h", "Root", "Admin", null, null, hoy);
+        UsuarioBase a = UsuarioFactory.Crear("Admin", "root", "h", "Root", "Admin", "12345678",null, null, hoy);
         Verificar("Crear('Admin') devuelve un Admin", a is Admin);
 
-        UsuarioBase r = UsuarioFactory.Crear("Recepcionista", "recep1", "h", "Rita", "López", null, null, hoy);
+        UsuarioBase r = UsuarioFactory.Crear("Recepcionista", "recep1", "h", "Rita", "López", "12345678",null, null, hoy);
         Verificar("Crear('Recepcionista') devuelve un Recepcionista", r is Recepcionista);
 
-        UsuarioBase d = UsuarioFactory.Crear("Recepcionista", "recep2", "h", "Rita", "López", null, null, hoy, activo: false, id: 9);
+        UsuarioBase d = UsuarioFactory.Crear("Recepcionista", "recep2", "h", "Rita", "López", "12345678",null, null, hoy, activo: false, id: 9);
         Verificar("La fábrica respeta activo=false e id=9", !d.Activo && d.Id == 9);
 
         VerificarRechazo("Un rol inventado ('Gerente') es rechazado",
-            () => UsuarioFactory.Crear("Gerente", "gerente", "h", "Gabriel", "Hernández", null, null, hoy));
+            () => UsuarioFactory.Crear("Gerente", "gerente", "h", "Gabriel", "Hernández", "12345678",null, null, hoy));
     }
 
     // ---------- 3. SEGURIDAD ----------
@@ -197,7 +200,7 @@ public static class PruebasGenerales
         string mensaje;
         Verificar("Se puede abrir la conexión", ConexionBd.ProbarConexion(out mensaje));
 
-        string[] tablas = { "Socios", "Tipo_Membresias", "empleados", "Usuario", "Membresia", "Pago", "asistencias" };
+        string[] tablas = { "Socios", "Tipo_Membresias", "Empleados", "Usuario", "Membresia", "Pago", "Asistencias" };
 
         using (SQLiteConnection conexion = ConexionBd.ObtenerConexion())
         {
@@ -263,15 +266,15 @@ public static class PruebasGenerales
         Verificar("ObtenerUltimos(2) no devuelve más de 2 líneas", LogService.ObtenerUltimos(2).Count <= 2);
     }
 
-    // ---------- 8. INTERFAZ IUsuarioDao E INICIALIZADOR ----------
+    // ---------- 8. INTERFAZ IUsuarioDAO E INICIALIZADOR ----------
     private static void PruebasDaoEInicializador()
     {
         // LoginService con un DAO "de mentira": prueba la lógica sin tocar la base real
-        UsuarioDaoFalso falso = new UsuarioDaoFalso();
+        UsuarioDAOFalso falso = new UsuarioDAOFalso();
         LoginService login = new LoginService(falso);
 
         UsuarioBase? usuario = login.Ingresar("falso", "clave123");
-        Verificar("LoginService funciona con cualquier IUsuarioDao (DAO falso)", usuario is Admin);
+        Verificar("LoginService funciona con cualquier IUsuarioDAO (DAO falso)", usuario is Admin);
         Verificar("El servicio le manda al DAO el HASH, no la contraseña en texto plano",
             falso.UltimoHashRecibido == Seguridad.CalcularHash("clave123") && falso.UltimoHashRecibido != "clave123");
         Verificar("Si el DAO no encuentra al usuario, el login devuelve null", login.Ingresar("otro", "x") == null);
@@ -302,8 +305,8 @@ public static class PruebasGenerales
         }
     }
 
-    // DAO falso: cumple el contrato IUsuarioDao pero no usa ninguna base de datos
-    private class UsuarioDaoFalso : IUsuarioDao
+    // DAO falso: cumple el contrato IUsuarioDAO pero no usa ninguna base de datos
+    private class UsuarioDAOFalso : IUsuarioDAO
     {
         public string? UltimoHashRecibido;
 
@@ -313,7 +316,7 @@ public static class PruebasGenerales
 
             if (nombreUsuario == "falso")
             {
-                return new Admin("falso", contrasenaHash, "Falso", "Prueba", null, null, DateTime.Today);
+                return new Admin("falso", contrasenaHash, "Falso", "Prueba","12345678" ,null, null, DateTime.Today);
             }
             return null;
         }

@@ -1,12 +1,17 @@
-using System;
-namespace UsuarioDAO
-{
-
-    public class Program
+ public class Program
     {
-        public static void Main(string[] args)
-        {
-         
+      public static void Main(string[] args)
+      {
+            // Modo pruebas de socios: dotnet run -- --pruebas-socios
+            if (args.Length > 0 && args[0] == "--pruebas-socios")
+            {
+                PruebasSocios.Ejecutar();
+                Console.WriteLine("\nPresioná una tecla para salir...");
+                Console.ReadKey();
+                return;
+            }
+
+
             // Modo pruebas: dotnet run -- --pruebas  (o el perfil "Pruebas" en Visual Studio)
             if (args.Length > 0 && args[0] == "--pruebas")
             {
@@ -58,6 +63,5 @@ namespace UsuarioDAO
             // 4. Menú principal: depende del ROL y de la LICENCIA
             MenuPrincipal menu = new MenuPrincipal(actual, licencia);
             menu.Mostrar();
-        }
-    }
-}
+       }
+ }

@@ -56,12 +56,13 @@ public static class InicializadorBd
                 apellido   TEXT NOT NULL,
                 email      TEXT UNIQUE,
                 telefono   TEXT,
-                Estado     TEXT NOT NULL DEFAULT 'Activo',
+                estado     TEXT NOT NULL DEFAULT 'Activo',
                 fecha_alta TEXT NOT NULL DEFAULT (datetime('now', 'localtime'))
             )",
 
-            @"CREATE TABLE IF NOT EXISTS empleados (
+            @"CREATE TABLE IF NOT EXISTS Empleados (
                 id_empleado   INTEGER PRIMARY KEY AUTOINCREMENT,
+                dni           TEXT NOT NULL UNIQUE,
                 nombre        TEXT NOT NULL,
                 apellido      TEXT NOT NULL,
                 email         TEXT UNIQUE,
@@ -77,7 +78,7 @@ public static class InicializadorBd
                 nombre_usuario TEXT NOT NULL UNIQUE,
                 contrasenahash TEXT NOT NULL,
                 rol            TEXT NOT NULL CHECK (rol IN ('admin', 'usuario')),
-                FOREIGN KEY (id_empleado) REFERENCES empleados (id_empleado)
+                FOREIGN KEY (id_empleado) REFERENCES Empleados (id_empleado)
                     ON UPDATE CASCADE ON DELETE RESTRICT
             )",
 
@@ -105,7 +106,7 @@ public static class InicializadorBd
                      ON UPDATE CASCADE ON DELETE RESTRICT
             )",
 
-            @"CREATE TABLE IF NOT EXISTS asistencias (
+            @"CREATE TABLE IF NOT EXISTS Asistencias (
                 id_asis  INTEGER PRIMARY KEY AUTOINCREMENT,
                 id_socio INTEGER NOT NULL,
                 tiempo   TEXT NOT NULL DEFAULT (datetime('now', 'localtime')),
@@ -155,24 +156,23 @@ public static class InicializadorBd
             return;
         }
 
-        int idAdmin = ObtenerOCrearEmpleado(conexion, "Admin", "Sistema",
+        int idAdmin = ObtenerOCrearEmpleado(conexion, "12345678", "Admin", "Sistema",
                                             "admin@gimnasio.com", "0000000000", "Administrador");
         InsertarUsuario(conexion, idAdmin, "admin", Seguridad.CalcularHash("admin123"), "admin");
 
-        int idRecepcion = ObtenerOCrearEmpleado(conexion, "Recepcion", "Gimnasio",
+        int idRecepcion = ObtenerOCrearEmpleado(conexion, "12345679", "Recepcion", "Gimnasio",
                                                 "recepcion@gimnasio.com", "0000000001", "Recepcionista");
         InsertarUsuario(conexion, idRecepcion, "recepcion", Seguridad.CalcularHash("recep123"), "usuario");
     }
 
-    private static int ObtenerOCrearEmpleado(SQLiteConnection conexion, string nombre, string apellido,
-                                             string email, string telefono, string puesto)
+  private static int ObtenerOCrearEmpleado(SQLiteConnection conexion, string dni, string nombre,
+        string apellido, string email, string telefono, string puesto)
     {
-        // OR IGNORE: si ya existía un empleado con ese email, no lo duplica
-        string sqlInsertar = "INSERT OR IGNORE INTO empleados (nombre, apellido, email, telefono, puesto) " +
-                             "VALUES (@nombre, @apellido, @email, @telefono, @puesto)";
-
+        string sqlInsertar = "INSERT OR IGNORE INTO Empleados (dni, nombre, apellido, email, telefono, puesto) " +
+                             "VALUES (@dni, @nombre, @apellido, @email, @telefono, @puesto)";
         using (SQLiteCommand comando = new SQLiteCommand(sqlInsertar, conexion))
         {
+            comando.Parameters.AddWithValue("@dni", dni);
             comando.Parameters.AddWithValue("@nombre", nombre);
             comando.Parameters.AddWithValue("@apellido", apellido);
             comando.Parameters.AddWithValue("@email", email);
@@ -180,8 +180,7 @@ public static class InicializadorBd
             comando.Parameters.AddWithValue("@puesto", puesto);
             comando.ExecuteNonQuery();
         }
-
-        using (SQLiteCommand comando = new SQLiteCommand("SELECT id_empleado FROM empleados WHERE email = @email", conexion))
+        using (SQLiteCommand comando = new SQLiteCommand("SELECT id_empleado FROM Empleados WHERE email = @email", conexion))
         {
             comando.Parameters.AddWithValue("@email", email);
             return Convert.ToInt32(comando.ExecuteScalar());

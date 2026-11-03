@@ -1,9 +1,9 @@
 ﻿public class Admin : UsuarioBase
 {
-    public Admin(string nombreUsuario, string contrasenaHash, string nombre, string apellido,
-        string? email, string? telefono, DateTime fecha_creacion, bool activo = true, int id = 0) :
-        base(nombreUsuario, contrasenaHash, nombre, apellido, email, telefono,
-               fecha_creacion, activo, id)
+    public Admin(string nombreUsuario, string contrasenaHash, string nombre, string apellido, string dni,
+        string? email, string? telefono, DateTime fechaRegistro, bool activo = true, int id = 0) :
+        base(nombreUsuario, contrasenaHash, dni ,nombre, apellido, email, telefono,
+               fechaRegistro, activo, id)
     { }
     public override string Rol => "Admin";
     public override bool PuedeDarDeBajaSocios => true;
