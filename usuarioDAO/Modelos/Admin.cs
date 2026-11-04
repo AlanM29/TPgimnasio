@@ -10,4 +10,5 @@
     public override bool PuedeModificarPrecios => true;
     public override bool PuedeGestionarUsuarios => true;
     public override bool PuedeExportar => true;
+    public override bool PuedeAnularPagos => true;
 }

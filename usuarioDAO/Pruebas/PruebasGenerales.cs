@@ -102,7 +102,7 @@ public static class PruebasGenerales
         Verificar("Polimorfismo: de 2 usuarios solo 1 puede exportar", puedenExportar == 1);
     }
 
-    // ---------- 2. FÁBRICA ----------
+    // --- 2. FÁBRICA ---
     private static void PruebasFabrica()
     {
         DateTime hoy = DateTime.Today;
@@ -120,7 +120,7 @@ public static class PruebasGenerales
             () => UsuarioFactory.Crear("Gerente", "gerente", "h", "Gabriel", "Hernández", "12345678",null, null, hoy));
     }
 
-    // ---------- 3. SEGURIDAD ----------
+    // --- 3. SEGURIDAD ---
     private static void PruebasSeguridad()
     {
         string hash = Seguridad.CalcularHash("admin123");
@@ -132,7 +132,7 @@ public static class PruebasGenerales
         Verificar("Textos distintos dan hashes distintos", Seguridad.CalcularHash("abc") != Seguridad.CalcularHash("abd"));
     }
 
-    // ---------- 4. LICENCIA ----------
+    // ---- 4. LICENCIA ----  
     private static void PruebasLicencia()
     {
         LicenciaService servicio = new LicenciaService();
@@ -226,7 +226,7 @@ public static class PruebasGenerales
         }
     }
 
-    // ---------- 6. LOGIN ----------
+    // --- 6. LOGIN ---
     private static void PruebasLogin()
     {
         LoginService login = new LoginService();
@@ -247,7 +247,7 @@ public static class PruebasGenerales
         Verificar("Inyección SQL con comentario (--) es rechazada", login.Ingresar("admin' --", "x") == null);
     }
 
-    // ---------- 7. LOG ----------
+    // --- 7. LOG ---
     private static void PruebasLog()
     {
         string marca = "prueba-" + DateTime.Now.Ticks;
@@ -266,10 +266,10 @@ public static class PruebasGenerales
         Verificar("ObtenerUltimos(2) no devuelve más de 2 líneas", LogService.ObtenerUltimos(2).Count <= 2);
     }
 
-    // ---------- 8. INTERFAZ IUsuarioDAO E INICIALIZADOR ----------
+    // --- 8. INTERFAZ IUsuarioDAO E INICIALIZADOR ---
     private static void PruebasDaoEInicializador()
     {
-        // LoginService con un DAO "de mentira": prueba la lógica sin tocar la base real
+        // LoginService con un DAO "FALSO": prueba la lógica sin tocar la base real
         UsuarioDAOFalso falso = new UsuarioDAOFalso();
         LoginService login = new LoginService(falso);
 
@@ -279,7 +279,7 @@ public static class PruebasGenerales
             falso.UltimoHashRecibido == Seguridad.CalcularHash("clave123") && falso.UltimoHashRecibido != "clave123");
         Verificar("Si el DAO no encuentra al usuario, el login devuelve null", login.Ingresar("otro", "x") == null);
 
-        // InicializadorBd sobre una base en memoria (no toca el archivo real)
+        // InicializadorBd sobre una base en memoria.
         using ( SQLiteConnection memoria = new SQLiteConnection("Data Source=:memory:"))
         {
             memoria.Open();
@@ -320,6 +320,15 @@ public static class PruebasGenerales
             }
             return null;
         }
+
+        // El resto del contrato no se usa en estas pruebas
+        public UsuarioBase? ObtenerPorId(int id) => null;
+        public UsuarioBase? ObtenerPorNombreUsuario(string nombreUsuario) => null;
+        public List<UsuarioBase> ObtenerTodos(bool soloActivos) => new List<UsuarioBase>();
+        public int Insertar(UsuarioBase usuario) => 0;
+        public bool Actualizar(UsuarioBase usuario) => false;
+        public bool DarDeBaja(int id) => false;
+        public bool Reactivar(int id) => false;
     }
 
     // =====================================================
