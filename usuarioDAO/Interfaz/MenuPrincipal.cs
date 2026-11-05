@@ -99,6 +99,13 @@ public class MenuPrincipal
             new MenuSocios(new ServicioSocio(new SocioDAO()), _usuario).MostrarMenu();
             return;
         }
+        if (modulo == Modulos.Asistencias)
+        {
+            ServicioAsistencias servicio = new ServicioAsistencias(
+                new AsistenciaDAO(), new ValidadorMembresiaProvisorio(), new SocioDAO(), _licencia);
+            new MenuAsistencias(servicio, _usuario).MostrarMenu();
+            return;
+        }
 
         Console.WriteLine("[Módulo " + nombre + "] (acá se conecta el módulo real)");
 

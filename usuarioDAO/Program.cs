@@ -10,10 +10,17 @@
                 Console.ReadKey();
                 return;
             }
+         if (args.Length > 0 && args[0] == "--pruebas-servicio-asistencias")
+         {
+            PruebasServicioAsistencias.Ejecutar();
+            Console.WriteLine("\nPresioná una tecla para salir...");
+            Console.ReadKey();
+            return;
+         }
 
 
-            // Modo pruebas: dotnet run -- --pruebas  (o el perfil "Pruebas" en Visual Studio)
-            if (args.Length > 0 && args[0] == "--pruebas")
+        // Modo pruebas: dotnet run -- --pruebas  (o el perfil "Pruebas" en Visual Studio)
+        if (args.Length > 0 && args[0] == "--pruebas")
             {
                 PruebasGenerales.Ejecutar();
                 Console.WriteLine("\nPresioná una tecla para salir...");
