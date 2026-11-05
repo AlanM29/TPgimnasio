@@ -2,7 +2,7 @@ using System;
 using System.Collections.Generic;
 
 
-//  INTERFAZ: MenuPrincipal
+//  MenuPrincipal
 //  Une todo: el ROL del usuario y la LICENCIA del sistema
 public class MenuPrincipal
 {
@@ -22,7 +22,7 @@ public class MenuPrincipal
         do
         {
             MostrarOpciones();
-            opcion = LeerNumero("Opción: ", 0, 6);
+            opcion = LeerNumero("Opción: ", 0, 7);
             Console.WriteLine();
 
             switch (opcion)
@@ -31,10 +31,10 @@ public class MenuPrincipal
                     AbrirModulo(Modulos.Socios, "Socios");
                     break;
                 case 2:
-                    AbrirModulo(Modulos.Membresias, "Membresías");
+                    AbrirModulo(Modulos.Membresias, "Membresías", () => new MenuMembresias(new ServicioMembresias(new TipoMembresiaDAO(), new MembresiaDAO()), _usuario).Mostrar());
                     break;
                 case 3:
-                    AbrirModulo(Modulos.Pagos, "Pagos");
+                    AbrirModulo(Modulos.Pagos, "Pagos", () => new MenuPagos(_usuario).Mostrar());
                     break;
                 case 4:
                     AbrirModulo(Modulos.Asistencias, "Asistencias");
@@ -44,6 +44,9 @@ public class MenuPrincipal
                     break;
                 case 6:
                     Console.WriteLine(_licencia);
+                    break;
+                case 7:
+                    AbrirUsuarios();
                     break;
             }
 
@@ -62,13 +65,19 @@ public class MenuPrincipal
         Console.WriteLine("3. Pagos" + Marca(Modulos.Pagos));
         Console.WriteLine("4. Asistencias" + Marca(Modulos.Asistencias));
 
-        // Solo el admin ve esta opción (depende del ROL)
+        // Solo el admin ve esta opción 
         if (_usuario.PuedeGestionarUsuarios)
         {
             Console.WriteLine("5. Ver registro de actividad");
         }
 
         Console.WriteLine("6. Estado de la licencia");
+
+        // Solo el admin ve esta opción 
+        if (_usuario.PuedeGestionarUsuarios)
+        {
+            Console.WriteLine("7. Gestión de usuarios");
+        }
         Console.WriteLine("0. Salir");
     }
 
@@ -83,7 +92,9 @@ public class MenuPrincipal
     }
 
     // Control REAL de la licencia: si no incluye el módulo, no se abre
-    private void AbrirModulo(string modulo, string nombre)
+    // "abrir" es el menú real del módulo. Si todavía no está conectado, queda null y se muestra el aviso.
+    // Cuando estén los menús de Socios, Membresías y Asistencias se pasan igual que el de Pagos
+    private void AbrirModulo(string modulo, string nombre, Action? abrir = null)
     {
         if (!_licencia.PermiteModulo(modulo))
         {
@@ -95,7 +106,27 @@ public class MenuPrincipal
         LogService.Registrar(_usuario.Nombre_Usuario, "MODULO_ABIERTO", nombre);
 
 
-        Console.WriteLine("[Módulo " + nombre + "] (acá se conecta el módulo real)");
+        if (abrir == null)
+        {
+            Console.WriteLine("[Módulo " + nombre + "] (acá se conecta el módulo real)");
+            return;
+        }
+
+        abrir();
+    }
+
+    // Control: solo el admin puede gestionar usuarios
+    private void AbrirUsuarios()
+    {
+        if (!_usuario.PuedeGestionarUsuarios)
+        {
+            Console.WriteLine("No tenés permiso para gestionar usuarios.");
+            LogService.Registrar(_usuario.Nombre_Usuario, "ACCESO_DENEGADO", "Gestión de usuarios");
+            return;
+        }
+
+        LogService.Registrar(_usuario.Nombre_Usuario, "MODULO_ABIERTO", "Usuarios");
+        new MenuUsuarios(_usuario).Mostrar();
     }
 
     // Control: solo el admin puede ver el registro

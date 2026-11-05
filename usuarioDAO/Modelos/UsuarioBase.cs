@@ -12,6 +12,7 @@ public abstract class UsuarioBase: Persona
     public abstract bool PuedeModificarPrecios { get; }
     public abstract bool PuedeGestionarUsuarios { get; }
     public abstract bool PuedeExportar { get; }
+    public abstract bool PuedeAnularPagos { get; }
     
     //Constructor
     public UsuarioBase(string nombreUsuario, string contrasenaHash, string dni,string nombre, string apellido,

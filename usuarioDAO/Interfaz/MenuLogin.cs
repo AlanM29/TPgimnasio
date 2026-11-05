@@ -1,4 +1,5 @@
 using System;
+using System.Data.SQLite;
 
 //  INTERFAZ: MenuLogin
 public static class MenuLogin
@@ -17,7 +18,7 @@ public static class MenuLogin
             string nombre = Console.ReadLine() ?? "";
 
             Console.Write("Contraseña: ");
-            string clave = LeerContrasenaOculta();
+            string clave = EntradaConsola.LeerContrasenaOculta();
 
             // Validación: no se aceptan campos vacíos
             if (string.IsNullOrWhiteSpace(nombre) || string.IsNullOrWhiteSpace(clave))
@@ -26,7 +27,18 @@ public static class MenuLogin
                 continue;
             }
 
-            UsuarioBase? usuario = login.Ingresar(nombre.Trim(), clave);
+            UsuarioBase? usuario;
+            try
+            {
+                usuario = login.Ingresar(nombre.Trim(), clave);
+            }
+            catch (Exception ex) when (ex is SQLiteException || ex is ArgumentException)
+            {
+                // Falla de la base o un dato guardado inválido: no es culpa del usuario, no cuenta como intento
+                Console.WriteLine("No se pudo iniciar sesión por un error del sistema: " + ex.Message);
+                LogService.Registrar(nombre.Trim(), "ERROR_LOGIN", ex.Message);
+                return null;
+            }
             if (usuario != null)
             {
                 LogService.Registrar(usuario.Nombre_Usuario, "LOGIN", "Ingreso correcto (rol " + usuario.Rol + ")");
@@ -41,34 +53,5 @@ public static class MenuLogin
 
         LogService.Registrar("sistema", "BLOQUEO", "Se superaron los " + IntentosMaximos + " intentos de login");
         return null;
-    }
-
-    // Lee la contraseña 
-    private static string LeerContrasenaOculta()
-    {
-        string clave = "";
-        ConsoleKeyInfo tecla;
-
-        do
-        {
-            tecla = Console.ReadKey(true);
-
-            if (tecla.Key == ConsoleKey.Backspace)
-            {
-                if (clave.Length > 0)
-                {
-                    clave = clave.Substring(0, clave.Length - 1);
-                    Console.Write("\b \b");
-                }
-            }
-            else if (tecla.Key != ConsoleKey.Enter && !char.IsControl(tecla.KeyChar))
-            {
-                clave += tecla.KeyChar;
-                Console.Write("*");
-            }
-        } while (tecla.Key != ConsoleKey.Enter);
-
-        Console.WriteLine();
-        return clave;
     }
 }

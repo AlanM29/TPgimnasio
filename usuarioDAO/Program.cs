@@ -2,6 +2,15 @@
     {
       public static void Main(string[] args)
       {
+            // Modo pruebas de usuarios y pagos: dotnet run -- --pruebas-pagos
+            if (args.Length > 0 && args[0] == "--pruebas-pagos")
+            {
+                PruebasPagosUsuarios.Ejecutar();
+                Console.WriteLine("\nPresioná una tecla para salir...");
+                Console.ReadKey();
+                return;
+            }
+
             // Modo pruebas de socios: dotnet run -- --pruebas-socios
             if (args.Length > 0 && args[0] == "--pruebas-socios")
             {
@@ -54,7 +63,7 @@
             UsuarioBase? actual = MenuLogin.PedirCredenciales();
             if (actual == null)
             {
-                Console.WriteLine("Demasiados intentos fallidos. Cerrando el sistema.");
+                Console.WriteLine("No se pudo iniciar sesión (demasiados intentos fallidos o error del sistema). Cerrando.");
                 return;
             }
 
