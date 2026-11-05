@@ -1,10 +1,10 @@
 ﻿public class ServicioMembresias
 {
-    private readonly ITipoMembresiaDao _tipoDao;
-    private readonly IMembresiaDao _membresiaDao;
+    private readonly ITipoMembresiaDAO _tipoDao;
+    private readonly IMembresiaDAO _membresiaDao;
 
     // Recibe las interfaces, no las clases concretas: el servicio no sabe nada de SQLite
-    public ServicioMembresias(ITipoMembresiaDao tipoDao, IMembresiaDao membresiaDao)
+    public ServicioMembresias(ITipoMembresiaDAO tipoDao, IMembresiaDAO membresiaDao)
     {
         _tipoDao = tipoDao;
         _membresiaDao = membresiaDao;

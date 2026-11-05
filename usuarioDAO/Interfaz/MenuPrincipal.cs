@@ -31,7 +31,7 @@ public class MenuPrincipal
                     AbrirModulo(Modulos.Socios, "Socios");
                     break;
                 case 2:
-                    AbrirModulo(Modulos.Membresias, "Membresías");
+                    AbrirModulo(Modulos.Membresias, "Membresías", () => new MenuMembresias(new ServicioMembresias(new TipoMembresiaDAO(), new MembresiaDAO()), _usuario).Mostrar());
                     break;
                 case 3:
                     AbrirModulo(Modulos.Pagos, "Pagos", () => new MenuPagos(_usuario).Mostrar());

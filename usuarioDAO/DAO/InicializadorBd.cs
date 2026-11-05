@@ -46,8 +46,10 @@ public static class InicializadorBd
                 id_tipo       INTEGER PRIMARY KEY AUTOINCREMENT,
                 tipo          TEXT    NOT NULL UNIQUE,
                 precio_base   REAL    CHECK (precio_base IS NULL OR precio_base > 0),
-                duracion_dias INTEGER NOT NULL CHECK (duracion_dias > 0)
-            )",
+                duracion_dias INTEGER NOT NULL CHECK (duracion_dias > 0), 
+                recargo_porcentaje REAL NOT NULL DEFAULT 0
+                    CHECK (recargo_porcentaje >= 0 AND recargo_porcentaje <=  100)
+              )",
 
             @"CREATE TABLE IF NOT EXISTS Socios (
                 id_socio   INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -129,21 +131,26 @@ public static class InicializadorBd
             return;
         }
 
-        InsertarTipo(conexion, "Mensual", 25000, 30);
-        InsertarTipo(conexion, "Trimestral", 65000, 90);
-        InsertarTipo(conexion, "Anual", 220000, 365);
+        // Cuota = precio base * (1 + recargo / 100). Los premium llevan 20% de recargo
+        InsertarTipo(conexion, "Mensual", 25000, 30, 0);
+        InsertarTipo(conexion, "Trimestral", 65000, 90, 0);
+        InsertarTipo(conexion, "Anual", 220000, 365, 0);
+        InsertarTipo(conexion, "Mensual Premium", 25000, 30, 20);
+        InsertarTipo(conexion, "Trimestral Premium", 65000, 90, 20);
+        InsertarTipo(conexion, "Anual Premium", 220000, 365, 20);
     }
 
-    private static void InsertarTipo(SQLiteConnection conexion, string tipo, double precio, int dias)
+    private static void InsertarTipo(SQLiteConnection conexion, string tipo, double precio, int dias, double recargo)
     {
-        string sql = "INSERT INTO Tipo_Membresias (tipo, precio_base, duracion_dias) " +
-                     "VALUES (@tipo, @precio, @dias)";
+        string sql = "INSERT INTO Tipo_Membresias (tipo, precio_base, duracion_dias, recargo_porcentaje) " +
+                     "VALUES (@tipo, @precio, @dias, @recargo)";
 
         using (SQLiteCommand comando = new SQLiteCommand(sql, conexion))
         {
             comando.Parameters.AddWithValue("@tipo", tipo);
             comando.Parameters.AddWithValue("@precio", precio);
             comando.Parameters.AddWithValue("@dias", dias);
+            comando.Parameters.AddWithValue("@recargo", recargo);
             comando.ExecuteNonQuery();
         }
     }

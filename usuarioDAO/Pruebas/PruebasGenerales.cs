@@ -287,13 +287,13 @@ public static class PruebasGenerales
 
             Verificar("InicializadorBd crea las 7 tablas",
                 ContarFilas(memoria, "SELECT COUNT(*) FROM sqlite_master WHERE type = 'table' AND name NOT LIKE 'sqlite_%'") == 7);
-            Verificar("... y carga los 3 tipos de membresía", ContarFilas(memoria, "SELECT COUNT(*) FROM Tipo_Membresias") == 3);
+            Verificar("... y carga los 6 tipos de membresía", ContarFilas(memoria, "SELECT COUNT(*) FROM Tipo_Membresias") == 6);
             Verificar("... y los 2 usuarios iniciales", ContarFilas(memoria, "SELECT COUNT(*) FROM Usuario") == 2);
 
             InicializadorBd.Inicializar(memoria);
             Verificar("Ejecutarlo dos veces no duplica los datos",
                 ContarFilas(memoria, "SELECT COUNT(*) FROM Usuario") == 2 &&
-                ContarFilas(memoria, "SELECT COUNT(*) FROM Tipo_Membresias") == 3);
+                ContarFilas(memoria, "SELECT COUNT(*) FROM Tipo_Membresias") == 6);
         }
     }
 
