@@ -117,18 +117,31 @@ public class MenuPrincipal
             new MenuAsistencias(servicio, _usuario).MostrarMenu();
             return;
         }
-
-        Console.WriteLine("[Módulo " + nombre + "] (acá se conecta el módulo real)");
-
+        if (abrir == null)
+        {
+            Console.WriteLine("[Módulo " + nombre + "] (aca se conecta el módulo real).");
+            return;
+        }
+        abrir();
     }
 
     // Control: solo el admin puede ver el registro
+    private void AbrirUsuarios()
+    {
+        if (!_usuario.PuedeGestionarUsuarios)
+        {
+            Console.WriteLine("No tenés permiso para gestionar usuarios.");
+            LogService.Registrar(_usuario.Nombre_Usuario, "ACCESO_DENEGADO", "Gestion de usuarios");
+            return;
+        }
+        new MenuUsuarios(_usuario).Mostrar();
+    }
     private void VerRegistro()
     {
         if (!_usuario.PuedeGestionarUsuarios)
         {
             Console.WriteLine("No tenés permiso para ver el registro de actividad.");
-            LogService.Registrar(_usuario.Nombre_Usuario, "ACCESO_DENEGADO", "Registro de actividad");
+            LogService.Registrar(_usuario.Nombre_Usuario, "ACCESO_DENEGADO", "Gestion de usuarios");
             return;
         }
 
