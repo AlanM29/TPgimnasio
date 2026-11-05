@@ -59,8 +59,12 @@
         Verificar("Ambos conservan el DNI", p1.Dni == "12345678" && p2.Dni == "87654321");
         Rechazo("Un usuario con DNI inválido", () => new Admin("anita", "h", "Ana", "Pérez", "abc", null, null, hoy));
         Rechazo("Un usuario con DNI vacío", () => new Recepcionista("lucia", "h", "Lu", "Gómez", "", null, null, hoy));
+        Socio original = new Socio("12345678", "Ana", "Pérez", "ana@mail.com", null, hoy);
+        try { original.ActualizarContacto("Nuevo", "Nuevo", "email-malo", null); } catch (ArgumentException) { }
+        Verificar("Si la validación falla, el objeto no queda a medias",
+                  original.Nombre == "Ana" && original.Apellido == "Pérez" && original.Email == "ana@mail.com");
 
-}
+    }
 
     private static void PruebasDao()
     {

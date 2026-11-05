@@ -50,7 +50,7 @@ public class SocioDAO : DaoBase, ISocioDAO
             socio.AsignarId(id);
             return id;
         }
-        catch (SQLiteException ex) when (EsDuplicado(ex))
+        catch (SQLiteException ex) when (ex.Message.Contains("UNIQUE constraint failed"))
         {
             if (ex.Message.Contains("Socios.dni"))
             {
