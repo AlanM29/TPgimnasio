@@ -16,10 +16,6 @@
 	</ItemGroup>
 
 	<ItemGroup>
-	
-	</ItemGroup>
-
-	<ItemGroup>
 		<None Update="licencia.txt">
 			<CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
 		</None>

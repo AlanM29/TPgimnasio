@@ -20,8 +20,22 @@
                 Console.ReadKey();
                 return;
             }
+          if (args.Length > 0 && args[0] == "--pruebas-servicio-socios")
+           {
+            PruebasServicioSocios.Ejecutar();
+            Console.WriteLine("\nPresioná una tecla para salir...");
+            Console.ReadKey();
+            return;
+           }
+        if (args.Length > 0 && args[0] == "--pruebas-asistencias")
+        {
+            PruebasAsistencias.Ejecutar();
+            Console.WriteLine("\nPresioná una tecla para salir...");
+            Console.ReadKey();
+            return;
+        }
 
-            Console.WriteLine("=== SISTEMA DE GESTIÓN DEL GIMNASIO ===\n");
+        Console.WriteLine("=== SISTEMA DE GESTIÓN DEL GIMNASIO ===\n");
 
             // 1. LICENCIA: si es inválida, el sistema se bloquea
             LicenciaService licenciaService = new LicenciaService();

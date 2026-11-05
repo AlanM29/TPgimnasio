@@ -94,8 +94,14 @@ public class MenuPrincipal
 
         LogService.Registrar(_usuario.Nombre_Usuario, "MODULO_ABIERTO", nombre);
 
+        if (modulo == Modulos.Socios)
+        {
+            new MenuSocios(new ServicioSocio(new SocioDAO()), _usuario).MostrarMenu();
+            return;
+        }
 
         Console.WriteLine("[Módulo " + nombre + "] (acá se conecta el módulo real)");
+
     }
 
     // Control: solo el admin puede ver el registro

@@ -52,7 +52,7 @@ public class SocioDAO : ISocioDAO
                 return id;
             }
         }
-        catch (SQLiteException ex) when (ex.Message.Contains("UNIQUE constraint faile"))
+        catch (SQLiteException ex) when (ex.Message.Contains("UNIQUE constraint failed"))
         {
             if (ex.Message.Contains("Socios.dni"))
             {
